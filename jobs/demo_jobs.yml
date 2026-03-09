@@ -5,24 +5,23 @@ jobs:
     environment_id: "{{ environment_id }}"
     name: "{{ ENVIRONMENT }} - deploy_demo_model"
 
-    settings:
-      threads: 1
-      target_name: default
+    threads: 1
+    target_name: default
 
-    execution:
-      timeout_seconds: 0
-      run_generate_sources: false
-      execute_steps:
-        - dbt build --select my_first_dbt_model
+    run_generate_sources: false
+
+    execute_steps:
+      - dbt build --select my_first_dbt_model
 
     generate_docs: false
 
     schedule:
       cron: "0 0 * * *"
-      timezone: "UTC"
 
     triggers:
       github_webhook: false
       git_provider_webhook: false
       schedule: false
       on_merge: false
+
+    environment_variables: []
