@@ -1,0 +1,28 @@
+name: Sync DBT Cloud Jobs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'jobs/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - run: pip install dbt-jobs-as-code~=0.6.0
+
+      - name: Sync
+        run: dbt-jobs-as-code sync jobs/demo_jobs.yml --vars-yml jobs/DEV_vars.yml
+
+        env:
+          DBT_API_KEY: ${{ secrets.CDP_DBT_API_KEY }}
+          DBT_BASE_URL: "https://cloud.getdbt.com"
