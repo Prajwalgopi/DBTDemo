@@ -21,5 +21,5 @@ jobs:
     triggers:
       schedule: false
       github_webhook: false
-     fgit_provider_webhook: false
+      git_provider_webhook: false
       on_merge: false
