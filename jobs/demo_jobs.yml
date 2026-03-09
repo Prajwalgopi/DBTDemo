@@ -5,8 +5,9 @@ jobs:
     environment_id: "{{ environment_id }}"
     name: "{{ ENVIRONMENT }} - deploy_demo_model"
 
-    threads: 1
-    target_name: default
+    settings:
+      threads: 1
+      target_name: default
 
     run_generate_sources: false
 
