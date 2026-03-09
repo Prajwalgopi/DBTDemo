@@ -1,4 +1,4 @@
-# triggering job creations
+# triggering job creation
 jobs:
   deploy_demo_model:
     account_id: "{{ account_id }}"
