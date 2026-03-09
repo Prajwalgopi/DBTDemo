@@ -1,10 +1,9 @@
-# testing CICD pipeline
 jobs:
   deploy_demo_model:
     account_id: "{{ account_id }}"
     project_id: "{{ project_id }}"
     environment_id: "{{ environment_id }}"
-    name: "{{ ENVIRONMENT }} - "
+    name: "{{ ENVIRONMENT }} - deploy_demo_model"
 
     settings:
       threads: 1
@@ -16,12 +15,14 @@ jobs:
       execute_steps:
         - dbt build --select my_first_dbt_model
 
+    generate_docs: false
+
     schedule:
       cron: "0 0 * * *"
       timezone: "UTC"
 
     triggers:
-      schedule: false
       github_webhook: false
       git_provider_webhook: false
+      schedule: false
       on_merge: false
