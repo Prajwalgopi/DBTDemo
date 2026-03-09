@@ -35,24 +35,7 @@ jobs:
       - name: Trigger dbt Job Run
         run: |
           ACCOUNT_ID=70471823540206
-
-          echo "Fetching dbt jobs from API..."
-
-          RESPONSE=$(curl -s \
-            -H "Authorization: Token $DBT_API_KEY" \
-            https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/)
-
-          echo "API response received"
-
-          JOB_ID=$(echo "$RESPONSE" | jq -r '.data[0].id')
-
-          if [ "$JOB_ID" = "null" ] || [ -z "$JOB_ID" ]; then
-            echo "No job found in dbt Cloud account"
-            echo "$RESPONSE"
-            exit 1
-          fi
-
-          echo "Job ID: $JOB_ID"
+          JOB_ID=70471823571037
 
           echo "Triggering dbt job..."
 
