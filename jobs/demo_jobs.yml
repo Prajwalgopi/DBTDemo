@@ -14,6 +14,12 @@ jobs:
       execute_steps:
         - dbt build --select my_first_dbt_model
 
+    schedule:
+      cron: "0 0 * * *"
+      timezone: "UTC"
+
     triggers:
       schedule: false
+      github_webhook: false
+     fgit_provider_webhook: false
       on_merge: false
