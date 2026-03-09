@@ -12,17 +12,61 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - run: pip install dbt-jobs-as-code~=0.6.0
+      - name: Install dbt-jobs-as-code
+        run: pip install dbt-jobs-as-code~=0.6.0
 
-      - name: Sync
+      - name: Sync dbt Cloud Jobs
         run: dbt-jobs-as-code sync jobs/demo_jobs.yml --vars-yml jobs/DEV_vars.yml
-
         env:
           DBT_API_KEY: ${{ secrets.CDP_DBT_API_KEY }}
-          DBT_BASE_URL: "https://cloud.getdbt.com/api/v2"
+          DBT_BASE_URL: "https://xh467.us1.dbt.com"
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Trigger dbt Job Run
+        run: |
+          ACCOUNT_ID=70471823540206
+
+          echo "Fetching dbt jobs from API..."
+
+          RESPONSE=$(curl -s \
+            -H "Authorization: Token $DBT_API_KEY" \
+            https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/)
+
+          echo "API response received"
+
+          JOB_ID=$(echo "$RESPONSE" | jq -r '.data[0].id')
+
+          if [ "$JOB_ID" = "null" ] || [ -z "$JOB_ID" ]; then
+            echo "No job found in dbt Cloud account"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          echo "Job ID: $JOB_ID"
+
+          echo "Triggering dbt job..."
+
+          RUN_RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Token $DBT_API_KEY" \
+            -H "Content-Type: application/json" \
+            https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/)
+
+          RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
+
+          echo "dbt job triggered successfully"
+          echo "Run ID: $RUN_ID"
+
+          echo "Run URL:"
+          echo "https://xh467.us1.dbt.com/#/accounts/$ACCOUNT_ID/runs/$RUN_ID/"
+        env:
+          DBT_API_KEY: ${{ secrets.CDP_DBT_API_KEY }}
