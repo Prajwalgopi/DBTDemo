@@ -37,16 +37,25 @@ jobs:
           ACCOUNT_ID=70471823540206
           JOB_ID=70471823571037
 
+          echo "Preparing API payload..."
+
+          PAYLOAD=$(cat <<EOF
+          {
+            "cause": "Triggered from GitHub Actions CI/CD pipeline"
+          }
+          EOF
+          )
+
           echo "Triggering dbt job..."
 
           RUN_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Token $DBT_API_KEY" \
             -H "Content-Type: application/json" \
-            -d '{"cause":"Triggered via GitHub Actions CI/CD pipeline"}' \
+            --data "$PAYLOAD" \
             https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/)
 
           echo "API Response:"
-          echo $RUN_RESPONSE
+          echo "$RUN_RESPONSE"
 
           RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
 
