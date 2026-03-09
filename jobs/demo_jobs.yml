@@ -11,6 +11,8 @@ jobs:
       target_name: default
 
     execution:
+      timeout_seconds: 0
+      run_generate_sources: false
       execute_steps:
         - dbt build --select my_first_dbt_model
 
