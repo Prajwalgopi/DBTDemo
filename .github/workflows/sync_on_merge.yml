@@ -36,11 +36,15 @@ jobs:
         run: |
           ACCOUNT_ID=70471823540206
 
-          echo "Fetching dbt job ID..."
+          echo "Fetching dbt job list..."
 
-          JOB_ID=$(curl -s -H "Authorization: Token $DBT_CLOUD_API_KEY" \
-          https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/ \
-          | jq '.data[] | select(.name=="DEV - deploy_demo_model") | .id')
+          RESPONSE=$(curl -s \
+            -H "Authorization: Token $DBT_CLOUD_API_KEY" \
+            https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/)
+
+          echo "Parsing job id..."
+
+          JOB_ID=$(echo $RESPONSE | jq '.data[0].id')
 
           echo "Job ID: $JOB_ID"
 
@@ -58,6 +62,5 @@ jobs:
 
           echo "Run URL:"
           echo "https://xh467.us1.dbt.com/#/accounts/$ACCOUNT_ID/runs/$RUN_ID/"
-
         env:
           DBT_API_KEY: ${{ secrets.CDP_DBT_API_KEY }}
