@@ -42,7 +42,7 @@ jobs:
           RUN_RESPONSE=$(curl -s -X POST \
             -H "Authorization: Token $DBT_API_KEY" \
             -H "Content-Type: application/json" \
-            -d '{}' \
+            -d '{"cause":"Triggered via GitHub Actions CI/CD pipeline"}' \
             https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/)
 
           echo "API Response:"
