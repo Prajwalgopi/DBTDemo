@@ -25,4 +25,4 @@ jobs:
 
         env:
           DBT_API_KEY: ${{ secrets.CDP_DBT_API_KEY }}
-          DBT_BASE_URL: "https://cloud.getdbt.com"
+          DBT_BASE_URL: "https://cloud.getdbt.com/api/v2"
