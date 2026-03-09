@@ -37,34 +37,26 @@ jobs:
           ACCOUNT_ID=70471823540206
           JOB_ID=70471823571037
 
-          echo "Preparing API payload..."
-
-          PAYLOAD=$(cat <<EOF
-          {
-            "cause": "Triggered from GitHub Actions CI/CD pipeline"
-          }
-          EOF
-          )
-
           echo "Triggering dbt job..."
 
-          RUN_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Token $DBT_API_KEY" \
-            -H "Content-Type: application/json" \
-            --data "$PAYLOAD" \
-            https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/)
+          RESPONSE=$(curl -s -X POST \
+          https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/ \
+          -H "Authorization: Token $DBT_API_KEY" \
+          -H "Content-Type: application/json" \
+          --data-raw '{"cause": "Triggered via GitHub Actions pipeline"}')
 
-          echo "API Response:"
-          echo "$RUN_RESPONSE"
+          echo "API response:"
+          echo "$RESPONSE"
 
-          RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
+          SUCCESS=$(echo "$RESPONSE" | jq -r '.status.is_success')
 
-          if [ "$RUN_ID" = "null" ] || [ -z "$RUN_ID" ]; then
-            echo "Failed to trigger dbt job."
+          if [ "$SUCCESS" != "true" ]; then
+            echo "Failed to trigger dbt job"
             exit 1
           fi
 
-          echo "dbt job triggered successfully"
+          RUN_ID=$(echo "$RESPONSE" | jq -r '.data.id')
+
           echo "Run ID: $RUN_ID"
 
           echo "Run URL:"
