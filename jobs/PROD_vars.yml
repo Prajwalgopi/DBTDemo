@@ -1,0 +1,4 @@
+PROJECT_ID: <dbt_project_id>
+ENVIRONMENT_ID: <prod_environment_id>
+ACCOUNT_ID: <account_id>
+ENVIRONMENT: 'PROD'
