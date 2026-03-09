@@ -36,26 +36,32 @@ jobs:
         run: |
           ACCOUNT_ID=70471823540206
 
-          echo "Fetching dbt job list..."
+          echo "Fetching dbt jobs from API..."
 
           RESPONSE=$(curl -s \
-            -H "Authorization: Token $DBT_CLOUD_API_KEY" \
+            -H "Authorization: Token $DBT_API_KEY" \
             https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/)
 
-          echo "Parsing job id..."
+          echo "API response received"
 
-          JOB_ID=$(echo $RESPONSE | jq '.data[0].id')
+          JOB_ID=$(echo "$RESPONSE" | jq -r '.data[0].id')
+
+          if [ "$JOB_ID" = "null" ] || [ -z "$JOB_ID" ]; then
+            echo "No job found in dbt Cloud account"
+            echo "$RESPONSE"
+            exit 1
+          fi
 
           echo "Job ID: $JOB_ID"
 
-          echo "Triggering dbt job run..."
+          echo "Triggering dbt job..."
 
           RUN_RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Token $DBT_CLOUD_API_KEY" \
+            -H "Authorization: Token $DBT_API_KEY" \
             -H "Content-Type: application/json" \
             https://xh467.us1.dbt.com/api/v2/accounts/$ACCOUNT_ID/jobs/$JOB_ID/run/)
 
-          RUN_ID=$(echo $RUN_RESPONSE | jq '.data.id')
+          RUN_ID=$(echo "$RUN_RESPONSE" | jq -r '.data.id')
 
           echo "dbt job triggered successfully"
           echo "Run ID: $RUN_ID"
